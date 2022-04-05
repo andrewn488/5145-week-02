@@ -1,0 +1,320 @@
+---
+title: "Week-02-Notes"
+author: "Andrew Nalundasan"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: 
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Week 2 Overview Video
+
++ Prof Andy is a skier! Went to Cairngorm with wife and 2 girls for a ski sesh
++ Communications - email and slack (@Prof.Andy)
++ Class materials - released on Friday's
++ Will review problem sets in overview videos
++ Need to learn how to do this the best way possible
++ Finish watching lecture videos prior to assignment videos
++ Everyone will have their own 5 DB's
++ Ensure can access my own DB
++ Files > scripts for creating DB's
+
+    + DB Schema example
+    + Example Data
+    + ignore modification scripts - don't need for this course
+    
++ Next week:
+
+    + go over queries
+    + talk about DTC
+    + feedback
+    
+
+# 02-01: SQL & SQL Server
+
+## Structured Query Language
+
++ Breaks - actually go do the work that's assigned. Not everything is graded, but it's all extremely important
++ SQL - standard language based on the relational model, for querying and managing data in a Relational DBMS
+
+    + SQL is a non-procedural language
+    + SQL cannot write complete applications
+    + No inherent user-interface
+    + SQL is used in conjunction with Procedural languages (R, Python, Java, C#)
+    + SQL is declarative (not imperative)
+        + we specify what we want
+        + DBMS decides how to get it
+    + e.g.: 
+        + "Get all the products that have sold more than 500 units in the last 2 years, but only for North America"
+    + SQL optimizes how to execute queries
+        
+
+## SQL History and SQL Server
+
++ Relational Model began ~ 1970 in a computer
++ SEQUEL 1974 was beginning of what we do today
++ Relational Software 1979 renamed to Oracle
++ ANSI standardized in 1982
++ dBase IV was first version of being a true relational DB
+
++ SQL Products
+
+    + Mainframe
+        + Oracle
+        + IBM DB2
+        + Ingres
+    + Client/Server - Web Server
+        + Microsoft SQL Server
+        + Oracle
+        + MySQL
+        + PostgreSQL
+    + Desktop
+        + Access
+        + Most server products
+        
++ Microsoft SQL Server
+
+    + Instance-based
+        + multiple instances can be installed multiple times on a single server
+        + 1 instance, multiple DB's
+        + separate instances, separate versions if desired (support older legacy applications)
+    + multiple installs on a single server
+    + performance control at an instance level
+    + security separation at an instance level
+    + supports multiple versions for legacy databases
+    + must reference a connection string
+
+
+# 02-02: SQL Database Setup
+
+## Create Databases and Load Data
+
++ create DB's
++ snodgrass has downloaded all the scripts and created the DB's for us
++ 2 versions of DB's
+
+    + "Example" - early on in the book
+    + "Modify" - more advanced
+    
++ Snodgrass already created all DB's for us and inserted all data into the tables
+
+## Database Diagram Assignment
+
++ Need some kind of a schema diagram
++ Create the DB diagram for each DB and grab screen shots
++ Do not submit schema files on Canvas
++ gain familiarity with the DB and its structure
+
+
+# 02-03: Chp 4 SELECT and ORDER BY
+
+## Assignment
+
+Do all "Problems for You" at end of Chapter 
+
++ Submit results in a Word document
++ Take questions they have and translate into SQL statement
+
+## SELECT
+
++ SELECT is the heart of most queries
++ Main thing analysts want to do is to SELECT data
++ Art of an analyst - translate the question into a query
+
++ SELECT Statement
+
+    + we SELECT columns
+    + specify FROM which table the columns need to come from 
+    + specify WHERE the condition should look
+    + GROUP BY will take the statement and aggregate it to sort it in a specified manner
+    + HAVING is a search condition in scenarios that use GROUP BY
+    
++ Simple SELECT statement
+
+    1. "Show me a list of all employees"
+    + where do I get the data <- Employees
+        + SELECT * FROM Employees;
+        + SELECT EmpLastName FROM Employees
+        + SELECT EmpLastName, EmpFirstName FROM Employees;
+    2. "Where do our customers live?" <- Customers
+        + always good to get clarification for what's being asked - be CURIOUS!
+        + SELECT * FROM Customers;
+        + SELECT CustCity FROM Customers;
+        + DISTINCT will return alphabetized list
+        + SELECT DISTINCT CustCity, CustSTate FROM Customers;
+    + Practice SELECT!
+
+## ORDER BY
+
++ ORDER BY - sorts the query results
++ Can use 1 or more columns
++ Result set uses the system's collating sequence (depending on DB and way its configured)
+
+    + Uppercase before lowercase
+    + Numbers before letters
+    + Year, month, date
+    
++ Start off with standard SELECT statement
++ Near end of SELECT statement is where ORDER BY clause is inserted 
+
+    1. List vendors by zipcode
+        + SELECT VendName, VendZipCode FROM Vendors
+          ORDER BY VendZipCode DESC
+        + ASC is default
+    2. List employees by name
+        + SELECT EmpLastName, EmpFirstName, EmpPhoneNumber, EmployeeID FROM
+          Employees ORDER BY EmpLastName DESC, EmpFirstName ASC
+
++ Can select columns not part of SELECT statement
+
+# 02-04: Chp 5 Expressions and Functions
+
++ All about moving beyond simple columns
++ want to do more than just show the data - need to do analyses on them!
++ this is done similar to excel
++ how to create columns that do more than just show simple data via Expressions
++ This class is about querying data, not about building DB's
+
+    + As an analyst, we must recognize the data types or know how to change them to do what we need to do
+    
+## Assignments
+
+Do all 12 problems at end of chapter for assignment
++ Submit results in a word document
+
+## Expressions and CAST
+
++ Expression <- an operation involving number, text, date, or time
+
++ Data Types
+
+    1. Character
+        + Exact or variable
+    2. Binary, BLOB
+    3. Numeric
+        + Integer, Float, Real, Currency, Digits
+    4. Boolean
+    5. DateTime
+        + Date, DateTime, Time, Interval
+
++ CAST
+
+    + Data types are not always compatible
+    + CAST allows conversion from one data type to another
+        + Converting an integer to decimal for averaging
+        + Converting datetime to date only for comparison
+        + Converting to the same character format for combining text
+        + Converting date to text to include in a string
+
++ CAST Example
+
+    + money datatype 
+        + SELECT quotedprice FROM Order_Details
+        + SELECT CAST(quotedprice AS numeric(12, 3))  # 12 digits, with 3 decimal points of precision
+          FROM Order_Details
+        
+
+## Expression Naming
+
++ Literals - things used in calculations and filtering
+
++ Expressions
+
+    + Calculated Columns should be named - ALWAYS NAME your calculated columns!
+        + "AS" is your friend
+        + Use it frequently
+    + Calculated Columns
+        + Literals
+        + Functions
+            + String
+            + Mathematical
+            + Date and time
+            
++ Naming Columns
+
+    + Name columns on expressions - always a good idea to NOT have "unnamed columns"
+    + Rename columns of existing fields
+        + SELECT EmpLastName AS LastNAME FROM Employees
+        + SELECT VendorName AS Vendor FROM Vendors;
+        + SELECT vrQty AS BidQuantity, axQty AS AgreedQuantity, dlQty AS DeliveredQuantity FROM SalesOrders;  # dealing with different "quantity" fields
+        
++ Literals
+
+    + String literals
+    + Numeric literals
+    + Datetime literals
+        + SELECT 'Name:' AS NameHeader, EmpLastName FROM Employees;
+        + SELECT BowlerID, RawScore FROM Bowlers_Scores WHERE RawScore > 225;
+
+
+## CONCAT and Formulas
+
++ Will frequently use CONCAT
+    
+    + For combining and working with Strings
+    1. Show me a list of all employees
+        + SELECT EmpLastName, EmpFirstName, FROM Employees
+        + SELECT CONCAT(EmpFirstName, '', EmpLastName) AS EmployeeName FROM Employees;
+        
++ Formulas
+
+    + Regular mathematical calculations
+        1. List product prices with a 10% increase
+            + SELECT retailprice, (retailprice * 1.10) AS newprice FROM Products;
+        2. What is our profit margin on last month's sales?
+        3. What happens to gross margin by product if sales are 10% lower for three months?
+
+## Functions and NULL
+
++ Functions <- enable you to use pre-built calculations and tools for manipulating data
++ Functions
+
+    + Aggregate
+    + Analytica
+    + Conversion
+    + Date & Time
+        + Date functions are fantastic for manipulation!
+    + Mathematical
+    + Logical
+    + String
+    + https://docs.microsoft.com/en-us/sql/t-sql/functions/functions?view=sql-server-ver15
+    
++ NULL
+
+    + We handle null with a function
+    + Null <- absence of a value
+        + NOT a 0 value
+        + NOT a blank space
+        + NOT a 0-length string
+    + **NULL breaks formulas and expressions**
+    + ISNULL()
+        + SELECT ISNULL(RawScore, 0) AS RawScoreClean
+          FROM Bowlers_Scores; 
+
+
+# 02-05: Chp 6 Filtering
+
+## Filtering Data
+
+
+
+## Comparisons
+
+
+
+## LIKE
+
+
+
+## BETWEEN
+
+
+
+## IS NULL, NOT
