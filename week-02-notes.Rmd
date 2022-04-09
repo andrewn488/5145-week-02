@@ -301,20 +301,182 @@ Do all 12 problems at end of chapter for assignment
 
 # 02-05: Chp 6 Filtering
 
+## Assignment
+
++ Chapter 6 problem set
++ do all of them
++ 
+
 ## Filtering Data
 
++ How do you filter the data down so you get just the results you need
 
++ WHERE statement
+
+    + this is the artform piece of a SELECT query
+    + comparative set of conditions that returns TRUE/FALSE/Unknown
+    + Search conditions:
+        + =, <>, !=, >, >=, <, <=
+        + LIKE, BETWEEN, IN, IS NULL, NOT LIKE NOT BETWEEN, NOT IN, IS NOT NULL
+        + AND, OR
+    + Just like building a formula - need parenthesis
+    + https://docs.microsoft.com/en-us/sql-t-sql/queries/where-transact-sql?view=sql-server-ver15
+    
 
 ## Comparisons
 
++ Standard arithmetic comparisons
 
+    + SELECT CustLastName FROM Customers
+      WHERE CustLastName = 'Smith';
+    + SELECT CustLastName FROM Customers
+      WHERE CustState = 'WA'; 
+        + must know data well enough to know that the states are abbreviated
+        + must be mindful of collating sequence in your management tool
+        
++ Compound filtering
+
+    + SELECT CustLastName FROM Customers
+      WHERE Cust State = 'WA'
+      AND CustCity <> 'Bellevue'; 
+    + SELECT CustLastName FROM Customers
+      WHERE Cust State = 'WA'
+      AND CustCity <> 'Bellevue'
+      AND CustCity <> 'Seattle'
+    + SELECT CustLastName FROM Customers
+      WHERE
+      (CustState = 'WA' AND CustCity <> 'Seattle') OR
+      (CustState = 'OR' AND CustCity <> 'Portland') OR
+      (CustState = 'ID' AND CustCity <> 'Boise' AND CustCity <> 'Twin Falls');
+    + Same results, different approaches: 
+    1. SELECT CustLastName FROM Customers
+       WHERE
+       (CustState = 'WA' AND CustCity <> 'Seattle') OR
+       (CustState = 'OR' AND CustCity <> 'Portland') OR
+       (CustState = 'ID' AND CustCity <> 'Boise' AND CustCity <> 'Twin Falls');
+    2. SELECT CustLastName FROM Customers
+       WHERE
+       (CustState = 'WA' OR CustState = 'OR' OR CustState = 'ID') AND 
+       (CustCity <> 'Seattle' AND AND CustCity <> 'Portland' AND CustCity <> 'Boise' AND CustCity <> 'Twin Falls')
+       
++ Complex
+"Customers from Seattle who spent more than $25,000 in the last two years"
+
+    + SELECT CustLastName FROM CustomerSales
+      WHERE
+      (CustState = 'WA' AND CustCity = 'Seattle') AND
+      (CustQty * ProductPrice > 25000) AND
+      (CustOrderDate >= '2018-01-01)
+      
++ Be Careful
+
+    + Potential for returning nothing
+    + SELECT CUstLastName FROM Customers
+      WHERE
+      (CustState = 'WA' AND CustCIty <> 'SEattle') AND
+      (CustState = 'OR' AND CustCity <> 'Portland'); 
+    + Because using AND for comparison which returns nothing
 
 ## LIKE
 
++ Condition statement to insert into WHERE clause - Pattern matching
 
+    + SELECT EmployeeKey, LastName FROM Employees
+      WHERE LastName LIKE 'Smith%';
+    + % - wildcard that looks for anything that start with 'Smith', and I don't care what happens after that
+    + SELECT ProductName, ProductDescription FROM Products
+      WHERE ProductName LIKE '%blue%' OR
+      ProductDescription LIKE '%blue%';
+        + case sensitive
+    + SELECT ProductName, ProductDescription FROM Products
+      WHERE LOWER (ProductName) LIKE '%blue%' OR
+      LOWER(ProductDescription) LIKE '%blue%';
+        + manipulate to lowercase first, prior to wildcard search since case sensitive
+        
++ Pattern Matching
+
+    + SELECT * FROM Sales
+      WHERE LOWER(SalesNotes) LIKE '%discount%'; 
+    + SELECT * FROM SupportCalls
+      WHERE LOWER(CallText) LIKE '%refund%';
+    + SELECT * FROM EquipmentLog
+      WHERE LOWER(LogEntry) LIKE '%error%';
+      
 
 ## BETWEEN
 
++ determines data that fits within a range
+
+    + SELECT LastName FROM Employees
+      WHERE DateHired BETWEEN '2019-01-01' AND
+      '2019-12-31';
+        + always format dates as YYYY-MM-DD
+    + Employees with 14-28 days of PTO (2 acceptable approaches)
+        1. SELECT LastName FROM Employees
+           WHERE VacationDays BETWEEN 14 AND 28;
+        2. SELECT LastName FROM Employees
+           WHERE VacationDays >= 14 AND
+           VacationDays <= 28
+    + Sales staff who met mid-range targets last month
+        + SELECT LastName FROM SalesTeam
+          WHERE SalesMetric BETWEEN 4 AND 7; 
+          ...and calc on how to get to 'last month'
+          
++ IN (membership)
+
+Customers in and around Seattle
+
+    + SELECT CustName FROM Customers
+      WHERE CustCity IN('Seattle', 'Kirkland', 'Redmond', 'Bothell'); 
+    + SELECT CUstName FROM Customers
+      WHERE CustCity = 'Seattle' OR CustCity = 'Kirkland', OR
+      CustCity = 'Redmond' OR CustCity = 'Bothell'; 
+
+Vendors on the west coast that placed large order (> 50k last year)
+
+    + SELECT * FROM VendorOrders
+      WHERE VendState IN ('WA', 'CA', 'OR', 'NV', 'NM') AND
+      VendSalesAmount > 50000 AND
+      VendSalesOrderDate BETWEEN '2019-01-01' AND '2019-12-31';
 
 
 ## IS NULL, NOT
+
++ IS NULL
+
+    + Equipment not submitting full log data
+    + Meant to be used in a WHERE clause
+    + SELECT EquipID FROM EqpLog
+      WHERE TempVal IS NULL OR
+      PressVal IS NULL OR FlowVal IS NULL; 
+      
++ Employees without evaluations
+
+    + SELECT EmpLastName FROM Employee
+      WHERE EvalDate IS NULL;
+
++ NOT
+
+    + SELECT LastName FROM Employees
+      WHERE (DateHired BETWEEN '2019-01-01' AND
+      '2019-12-31') AND NOT EmpDept = 'Sales'; 
+    + SELECT LastName FROM Employees
+      WHERE (DateHired BEWEEN '2019-01-01' AND
+      '2019-12-31') AND
+      EmpDept NOT IN ('Sales', 'Service', 'Support');
+      
++ Functions
+
+    + SELECT * FROM Sales
+      WHERE LOWER(SalesNotes) LIKE '%discount%'; 
+    + SELECT * FROM Products
+      WHERE SUBSTRING(ProdCategory,3,2) = 'UC'; 
+          + Product Category where start position 3 and length 2 
+    + SELECT * FROM Employees
+      WHERE YEAR(EmpBirthDate) < 1980;
+          + this will extract the year from the column
+    
+    
+
+
+
